@@ -14,14 +14,7 @@ const con= mysql.createConnection({
 	host:"mysql-philippehou.alwaysdata.net", 
 	user: "289337_root",
 	password: "Tm3x-dCQ7k3mLMf",
-	database:"philippehou_gestionproduit"
-/* 
-	  host:"localhost",
-	  user: "root",
-	  password: "Zh9$*@92If84",
-	  database:"gestionproduit" 
-*/ 
-
+	database:"philippehou_gestionproduit" 
 });
  
 con.connect(function(err){
@@ -43,64 +36,78 @@ app.get("/getAllProducts", function(request, response){
 });
  
 
-app.get("/getProduct/:id", function(request, response){
-    const id= request.params.id;
-    con.query("SELECT * FROM Produit WHERE id = ?", id, function(err, result, fields){
-        if(err) throw err;
-        if(result.length > 0 ){
+app.get("/getProduct/:id", function(req, res) { 
+    const id = req.params.id;
+
+    const query = "SELECT * FROM Produit WHERE id = ?;";
+    const values = [id];
+
+    con.query(query, values, function(err, result, fields) {
+        if(err) throw err; 
+        if (result.length > 0) {
             console.log(JSON.stringify(result[0]));
-            response.status(200).json({
-                message: "produit trouvé",
+            res.status(200).json({
+                message: "Product trouvé",
                 data: result[0]
             });
-            }
-     
-           else{
-            console.log("Produit non trouvé");
-            response.status(200).json({
-                message: "Aucun trouvé",
+        } else {
+            console.log("Product non trouvé");
+            res.status(404).json({
+                message: "Aucun acteur trouvé",
                 data: {}
             });
-           }
-        });
-    }); 
+        }
+    });
+});
  
 
-app.post("/createProduct", function(request, response){
-    const produit= request.body;
-    console.log(produit.description + " "+ produit.image + 
-            " "+ produit.prix +" "+ produit.details)
-    console.log(JSON.stringify(produit)); 
+app.post('/createProduct', (req, res) => {
+    const produit = {
+        description: req.body.description,
+        image: req.body.image,
+        prix: req.body.prix, 
+        details: req.body.details 
+    }; 
+     
+    const query = "INSERT INTO produit (description, image, prix, details) VALUES (?, ?, ?, ?);";
+    const values = [produit.description, produit.image, produit.prix, produit.details];
 
-    con.query("INSERT INTO Produit values(null, '" + produit.description +" ',' " + produit.image+
-    " ', " + produit.prix + " ,' " + produit.details + " '); ", function (err, result, fields)
-    {
-        if(err) throw err;  
-        response.status(200).json({ message: "Produit ajouté" });
-    }); 
-});
-
-app.put("/updateProduct/:id", function(request, response) {
-    const id = request.params.id;
-    const produit = request.body;  
-        
-        con.query("UPDATE Produit SET description = '" + produit.description +
-
-            "', image = '" + produit.image +
-            "', prix = '" + produit.prix +
-            "', details = '" + produit.details + 
-            "' WHERE id = " + id, function(err, result, fields) {
-            if (err) throw err; 
-            response.status(200).json({ message: "Produit modifié" }); 
+    con.query(query, values, (err, result, fields) => {
+        if (err) {
+            console.error("Error adding product:", err); 
+            return res.status(500).json({ message: "An error occurred while adding the product." });
+        }
+        res.status(200).json({ message: "Produit ajouté" });
     });
 });
 
+app.put("/updateProduct/:id", function(req, res) { 
+    const id= req.params.id; 
+    const produit = {
+        description: req.body.description,
+        image: req.body.image,
+        prix: req.body.prix, 
+        details: req.body.details 
+    }; 
+     
+    const query = "UPDATE Produit SET description = ?, image = ?, prix = ?, details = ?  WHERE id = ?;";
+     
+    const values = [produit.description, produit.image, produit.prix, produit.details, id];
 
-app.delete("/deleteProduct/:id", function(request, response){
-    const id= request.params.id;  
-    con.query("DELETE FROM Produit where id = "+ id, function(err, result, fields){ 
+    con.query(query, values, (err, result, fields) => {
+        if (err) throw err;
+        res.status(200).json({ message: "Produit modifié" });
+    }); 
+});
+
+
+app.delete("/deleteProduct/:id", function(req, res){
+    const id = req.params.id;  
+    query = "DELETE FROM Produit where id = ?";
+    const values = [id];
+    con.query(query, values, (err, result, fields) => { 
         if(err) throw err; 
-        response.status(200).json({ message: "Produit supprimé" }); 
+        res.status(200).json({ message: "Produit supprimé" }); 
     });  
 });
 
