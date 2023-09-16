@@ -11,7 +11,7 @@ app.listen(3000);
  
  
 // Middleware to check API token
-/* app.use((req, res, next) => {
+  app.use((req, res, next) => {
     const apiToken = req.headers.authorization;
 
     if (!apiToken || !apiToken.startsWith('Bearer ')) {
@@ -29,7 +29,14 @@ app.listen(3000);
         // API token is invalid, return an error response
         res.status(401).json({ error: 'Invalid API token' });
     }
-});  */
+});    
+
+/* const con= mysql.createConnection({ 
+    host:"localhost",
+    user: "root",
+    password: "Zh9$*@92If84", 
+    database:"gestionproduit"
+  }); */ 
 
     const con= mysql.createConnection({
     host:"mysql-philippehou.alwaysdata.net",
