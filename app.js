@@ -10,6 +10,27 @@ app.use(cors());
 app.use(bodyParser.json());
 app.listen(3000);
 
+// Middleware to check API token
+app.use((req, res, next) => {
+    const apiToken = req.headers.authorization;
+
+    if (!apiToken || !apiToken.startsWith('Bearer ')) {
+        // Authorization header is missing or doesn't start with 'Bearer '
+        return res.status(401).json({ error: 'Invalid authorization header' });
+    }
+
+    const token = apiToken.substring(7); // Remove 'Bearer ' prefix
+    const presetApiToken = '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'; // Replace with your actual preset API token
+
+    if (token === presetApiToken) {
+        // API token is valid, proceed to the route
+        next();
+    } else {
+        // API token is invalid, return an error response
+        res.status(401).json({ error: 'Invalid API token' });
+    }
+}); 
+
 const con= mysql.createConnection({
 	host:"mysql-philippehou.alwaysdata.net", 
 	user: "289337_root",
