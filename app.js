@@ -90,7 +90,7 @@ app.post('/createProduct', (req, res) => {
         details: req.body.details 
     }; 
      
-    const query = "INSERT INTO produit (description, image, prix, details) VALUES (?, ?, ?, ?);";
+    const query = "INSERT INTO Produit (description, image, prix, details) VALUES (?, ?, ?, ?);";
     const values = [produit.description, produit.image, produit.prix, produit.details];
 
     con.query(query, values, (err, result, fields) => {
